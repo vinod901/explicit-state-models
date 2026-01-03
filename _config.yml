@@ -1,0 +1,19 @@
+title: Explicit State Models
+description: A documentation exploration of implicit vs explicit state across industries
+theme: jekyll-theme-cayman
+baseurl: ""
+url: "https://vinod901.github.io/explicit-state-models"
+
+# Build settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Exclude files
+exclude:
+  - .git
+  - .gitignore
+  - README.md
+  - Gemfile
+  - Gemfile.lock
