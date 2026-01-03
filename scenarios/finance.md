@@ -185,6 +185,104 @@ Exceptions Registry:
 - Status (Pending/Approved/Declined)
 ```
 
+**Loan Application State Flow:**
+
+```
+┌───────────┐
+│ SUBMITTED │ ← Application received
+└─────┬─────┘
+      │
+      ▼
+┌───────────────┐
+│ CREDIT_REVIEW │ ← Analyst reviews financials, cash flow
+└───┬───────┬───┘
+    │       └─────────┐
+    │                 ▼
+    │            ┌──────────┐
+    │            │ DECLINED │ (Terminal)
+    │            └──────────┘
+    ▼
+┌──────────────────┐
+│ COLLATERAL_      │ ← Review equipment value, security
+│ REVIEW           │
+└─────┬────────────┘
+      │
+      ▼
+┌──────────────────┐
+│ COMPLIANCE_      │ ← Regulatory checks, KYC, AML
+│ REVIEW           │
+└─────┬────────────┘
+      │
+      ├──────────────────┐
+      ▼                  ▼
+┌──────────────┐   ┌─────────────────┐
+│ PRICING      │   │ PENDING_        │ ← Additional docs needed
+└──────┬───────┘   │ CONDITIONS      │
+       │           └────────┬────────┘
+       │                    │ Conditions met
+       │◄───────────────────┘
+       ▼
+┌──────────────────┐
+│ FINAL_APPROVAL   │ ← Senior management sign-off
+└─────┬────────────┘
+      │
+      ▼
+┌──────────────────┐
+│ CLOSING          │ ← Legal docs, signatures
+└─────┬────────────┘
+      │
+      ▼
+┌──────────────────┐
+│ FUNDED           │ ← Money disbursed
+└──────────────────┘
+
+Exception paths can occur at multiple states,
+requiring additional approvals before advancing.
+```
+
+**Before: Fragmented State Across Teams**
+
+```
+IMPLICIT STATE PROBLEM:
+
+Credit Analyst          Collateral Officer        Compliance Team
+      │                        │                         │
+   "I approved           "Waiting for             "Haven't started
+    the credit, I         credit decision          yet, no one
+    think"                before I start"          told me"
+      │                        │                         │
+      └────────────────────────┼─────────────────────────┘
+                               │
+                               ▼
+                    ❓ What's the actual status?
+                    ❓ Who should work on it now?
+                    ❓ Are we waiting on the borrower or internal review?
+
+No one knows the complete picture without asking around.
+```
+
+**After: Explicit State Provides Coordination**
+
+```
+EXPLICIT STATE SOLUTION:
+
+┌────────────────────────────────────────────────────────┐
+│  Loan Application: TechStart Manufacturing             │
+│  Status: COLLATERAL_REVIEW                             │
+│  Assigned to: Mike Chen                                │
+│  Entered state: March 2, 9:30 AM                       │
+│                                                         │
+│  ✓ Credit approved (Sarah, March 1, 4:45 PM)           │
+│  ► Collateral review IN PROGRESS                       │
+│  ⏳ Compliance review: QUEUED (starts after collateral) │
+│                                                         │
+│  Blockers: None                                        │
+│  Exceptions: 1 pending (debt coverage ratio)           │
+└────────────────────────────────────────────────────────┘
+
+Everyone sees: Current state, who's responsible, what's next.
+```
+
 ### Implementation
 
 The loan system now enforces state transitions and captures exception approvals.
@@ -544,6 +642,68 @@ Time in Review: 2.8 hours (within target)
 Sarah thought: "This is borderline. I have concerns, but they're not strong enough to reject. If I request more information, I'll miss my throughput target. The company has been operating for 5 years, so maybe I'm being too conservative. I'll approve it and add a note about the concerns - if something goes wrong, I can point to my note."
 
 She marks it APPROVED and adds a note buried in the file: "Monitor AR aging closely, sector headwinds noted."
+
+**The Gaming Dynamics:**
+
+```
+┌─────────────────────────────────────────────────────┐
+│         PERFORMANCE METRICS PRESSURE                │
+└──────────────────┬──────────────────────────────────┘
+                   │
+       ┌───────────┼───────────┐
+       │           │           │
+       ▼           ▼           ▼
+┌──────────┐ ┌──────────┐ ┌─────────────┐
+│ Time in  │ │ Approval │ │  Exception  │
+│  Review  │ │   Rate   │ │    Rate     │
+│ (Target: │ │ (Target: │ │  (Target:   │
+│  < 3 hrs)│ │  > 75%)  │ │   < 10%)    │
+└────┬─────┘ └────┬─────┘ └──────┬──────┘
+     │            │               │
+     └────────────┼───────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│   LOAN OFFICER DECISION PRESSURE        │
+│                                         │
+│  "Should I dig deeper into this         │
+│   concerning cash flow pattern?"        │
+│                                         │
+│   ┌─────────────────────────────────┐  │
+│   │  Dig Deeper:                    │  │
+│   │  • More time (miss target)      │  │
+│   │  • Might need to decline        │  │
+│   │  • May need exception           │  │
+│   │  • Looks "slow" to management   │  │
+│   └─────────────────────────────────┘  │
+│                                         │
+│   ┌─────────────────────────────────┐  │
+│   │  Quick Approval:                │  │
+│   │  • Hit time target ✓            │  │
+│   │  • Keep approval rate up ✓      │  │
+│   │  • Avoid exception process ✓    │  │
+│   │  • Add covering note            │  │
+│   │  • Blame-shift if it fails      │  │
+│   └─────────────────────────────────┘  │
+│                                         │
+└──────────────┬──────────────────────────┘
+               │
+               ▼
+┌──────────────────────────────────────────┐
+│  REPORTED STATE:                         │
+│  Status: APPROVED                        │
+│  Time: 2.8 hours ✓                       │
+│  Exceptions: 0 ✓                         │
+│                                          │
+│  ACTUAL STATE:                           │
+│  Quality: Questionable                   │
+│  Risk: Higher than appears               │
+│  Review: Rushed and incomplete           │
+└──────────────────────────────────────────┘
+
+The metrics incentivize appearance of thoroughness,
+not actual risk assessment quality.
+```
 
 **The Consequences:**
 

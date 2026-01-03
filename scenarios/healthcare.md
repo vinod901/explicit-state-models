@@ -48,6 +48,37 @@ This state is fragmented across:
 - **A sticky note**: On the case manager's desk, about the pharmacy issue
 - **Assumption**: "Someone must have scheduled the follow-up by now"
 
+**Coordination Challenge - Multiple Parties:**
+
+```
+                      ┌─────────────────┐
+                      │   MRS. CHEN     │
+                      │   (Patient)     │
+                      └────────┬────────┘
+                               │
+        ┌──────────────────────┼──────────────────────┐
+        │                      │                      │
+   ┌────▼────┐           ┌────▼────┐           ┌────▼────┐
+   │Hospital │           │ Home    │           │ Family  │
+   │  Team   │           │ Health  │           │ Daughter│
+   └────┬────┘           └────┬────┘           └────┬────┘
+        │                     │                      │
+   ┌────┴────┐           ┌────┴────┐           ┌────┴────┐
+   │Equipment│           │Pharmacy │           │  PCP    │
+   │ Company │           │         │           │ Office  │
+   └─────────┘           └─────────┘           └─────────┘
+
+Each has their own:
+- Information systems
+- Process states
+- Scheduling constraints
+- Communication methods
+
+No single party sees the complete picture.
+Each assumes others are handling their parts.
+Problems emerge only when someone asks "why hasn't she been discharged?"
+```
+
 ### What Happens: The 2:00 PM Conversation
 
 **Attending physician**: "Why hasn't Mrs. Chen been discharged? I cleared her this morning."
@@ -129,6 +160,68 @@ Required elements for READY_TO_DISCHARGE:
 - Follow-up: PCP Notified + Specialist Scheduled + Transportation Confirmed
 - Equipment: Identified + Ordered + Delivery Confirmed
 - Family: Contacted + Available + Education Complete
+```
+
+**State Transition Flow:**
+
+```
+┌─────────────────────┐
+│ MEDICALLY_CLEARING  │  Patient hospitalized, treatment ongoing
+└──────────┬──────────┘
+           │ Medical clearance obtained
+           ▼
+┌─────────────────────┐
+│ COORDINATION_       │  Case manager begins arranging
+│ PLANNING            │  home care, equipment, follow-ups
+└──────────┬──────────┘
+           │ All arrangements initiated
+           ▼
+┌─────────────────────┐
+│ AWAITING_           │  Waiting for external confirmations
+│ CONFIRMATIONS       │  (home health, pharmacy, equipment, family)
+└──────────┬──────────┘
+           │ All confirmations received
+           ▼
+┌─────────────────────┐
+│ READY_TO_DISCHARGE  │  Patient can leave hospital safely
+└──────────┬──────────┘
+           │ Patient departs
+           ▼
+┌─────────────────────┐
+│ DISCHARGED          │  Coordination complete
+└─────────────────────┘
+
+Blockers can move state back:
+  AWAITING_CONFIRMATIONS → COORDINATION_PLANNING (new issue discovered)
+```
+
+**Implicit vs. Explicit State Visibility:**
+
+```
+IMPLICIT STATE (Before):                EXPLICIT STATE (After):
+═══════════════════════                 ══════════════════════
+
+Information Sources:                    Single Unified View:
+┌──────────────────┐                   ┌─────────────────────────┐
+│ Nurse's Memory   │                   │  Discharge Dashboard    │
+│ "I think..."     │                   │                         │
+├──────────────────┤                   │  ✓ Medical clearance    │
+│ Phone Messages   │                   │  ⏳ Home health pending  │
+│ (not returned)   │                   │  ⚠ Equipment - wrong    │
+├──────────────────┤                   │     address             │
+│ Email            │    Transform      │  ✓ Family contacted     │
+│ (wrong dept)     │  ────────────>    │  ⏳ Pharmacy checking    │
+├──────────────────┤                   │  ✗ Transport not        │
+│ Sticky Notes     │                   │     arranged            │
+│ (on desk)        │                   │                         │
+├──────────────────┤                   │  Status: AWAITING_      │
+│ Assumptions      │                   │  CONFIRMATIONS          │
+│ "Someone must    │                   │                         │
+│  have..."        │                   │  Earliest discharge:    │
+└──────────────────┘                   │  Tomorrow 2:00 PM       │
+                                        └─────────────────────────┘
+Result: Fragmented,                     Result: Complete,
+        incomplete view                         actionable view
 ```
 
 ### Implementation
