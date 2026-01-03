@@ -1,11 +1,6 @@
----
-layout: default
-title: Finance Scenario - Commercial Loan Approval
----
-
 # Finance Scenario: Commercial Loan Approval
 
-[← Back to Home](/)
+[← Back to Home](../index.md)
 
 ## The Scenario: TechStart Manufacturing's Loan Application
 
@@ -585,6 +580,6 @@ And the answer depends on the specific institution, its processes, its regulator
 
 ---
 
-**Continue to:** [Core Concepts →](/concepts/core)
+**Continue to:** [Core Concepts →](../concepts/core.md)
 
-**Explore:** [Healthcare Scenario](/scenarios/healthcare) | [Failure Modes](/concepts/failure-modes) | [Back to Home](/)
+**Explore:** [Healthcare Scenario](healthcare.md) | [Failure Modes](../concepts/failure-modes.md) | [Back to Home](../index.md)

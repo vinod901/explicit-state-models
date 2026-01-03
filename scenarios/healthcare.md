@@ -1,11 +1,6 @@
----
-layout: default
-title: Healthcare Scenario - Patient Discharge Coordination
----
-
 # Healthcare Scenario: Patient Discharge Coordination
 
-[← Back to Home](/)
+[← Back to Home](../index.md)
 
 ## The Scenario: Mrs. Chen's Discharge
 
@@ -332,6 +327,6 @@ The goal is to understand **when**, **how**, and **at what cost** making state e
 
 ---
 
-**Continue to:** [Finance Scenario →](/scenarios/finance)
+**Continue to:** [Finance Scenario →](finance.md)
 
-**Explore:** [Core Concepts](/concepts/core) | [Failure Modes](/concepts/failure-modes) | [Back to Home](/)
+**Explore:** [Core Concepts](../concepts/core.md) | [Failure Modes](../concepts/failure-modes.md) | [Back to Home](../index.md)

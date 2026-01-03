@@ -1,11 +1,6 @@
----
-layout: default
-title: Core Concepts - States, Transitions, and Invariants
----
-
 # Core Concepts: States, Transitions, and Invariants
 
-[← Back to Home](/)
+[← Back to Home](../index.md)
 
 ## Introduction
 
@@ -438,6 +433,6 @@ The [Failure Modes](/concepts/failure-modes) page explores what goes wrong when 
 
 ---
 
-**Continue to:** [Uncertainty →](/concepts/uncertainty)
+**Continue to:** [Uncertainty →](uncertainty.md)
 
-**Explore:** [Healthcare Scenario](/scenarios/healthcare) | [Finance Scenario](/scenarios/finance) | [Failure Modes](/concepts/failure-modes) | [Back to Home](/)
+**Explore:** [Healthcare Scenario](../scenarios/healthcare.md) | [Finance Scenario](../scenarios/finance.md) | [Failure Modes](failure-modes.md) | [Back to Home](../index.md)
