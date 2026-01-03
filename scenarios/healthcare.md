@@ -1,11 +1,6 @@
----
-layout: default
-title: Healthcare Scenario - Patient Discharge Coordination
----
-
 # Healthcare Scenario: Patient Discharge Coordination
 
-[← Back to Home](/)
+[← Back to Home](../index.md)
 
 ## The Scenario: Mrs. Chen's Discharge
 
@@ -52,6 +47,37 @@ This state is fragmented across:
 - **An email**: From the equipment company, sent to the wrong department
 - **A sticky note**: On the case manager's desk, about the pharmacy issue
 - **Assumption**: "Someone must have scheduled the follow-up by now"
+
+**Coordination Challenge - Multiple Parties:**
+
+```
+                      ┌─────────────────┐
+                      │   MRS. CHEN     │
+                      │   (Patient)     │
+                      └────────┬────────┘
+                               │
+        ┌──────────────────────┼──────────────────────┐
+        │                      │                      │
+   ┌────▼────┐           ┌────▼────┐           ┌────▼────┐
+   │Hospital │           │ Home    │           │ Family  │
+   │  Team   │           │ Health  │           │ Daughter│
+   └────┬────┘           └────┬────┘           └────┬────┘
+        │                     │                      │
+   ┌────┴────┐           ┌────┴────┐           ┌────┴────┐
+   │Equipment│           │Pharmacy │           │  PCP    │
+   │ Company │           │         │           │ Office  │
+   └─────────┘           └─────────┘           └─────────┘
+
+Each has their own:
+- Information systems
+- Process states
+- Scheduling constraints
+- Communication methods
+
+No single party sees the complete picture.
+Each assumes others are handling their parts.
+Problems emerge only when someone asks "why hasn't she been discharged?"
+```
 
 ### What Happens: The 2:00 PM Conversation
 
@@ -134,6 +160,68 @@ Required elements for READY_TO_DISCHARGE:
 - Follow-up: PCP Notified + Specialist Scheduled + Transportation Confirmed
 - Equipment: Identified + Ordered + Delivery Confirmed
 - Family: Contacted + Available + Education Complete
+```
+
+**State Transition Flow:**
+
+```
+┌─────────────────────┐
+│ MEDICALLY_CLEARING  │  Patient hospitalized, treatment ongoing
+└──────────┬──────────┘
+           │ Medical clearance obtained
+           ▼
+┌─────────────────────┐
+│ COORDINATION_       │  Case manager begins arranging
+│ PLANNING            │  home care, equipment, follow-ups
+└──────────┬──────────┘
+           │ All arrangements initiated
+           ▼
+┌─────────────────────┐
+│ AWAITING_           │  Waiting for external confirmations
+│ CONFIRMATIONS       │  (home health, pharmacy, equipment, family)
+└──────────┬──────────┘
+           │ All confirmations received
+           ▼
+┌─────────────────────┐
+│ READY_TO_DISCHARGE  │  Patient can leave hospital safely
+└──────────┬──────────┘
+           │ Patient departs
+           ▼
+┌─────────────────────┐
+│ DISCHARGED          │  Coordination complete
+└─────────────────────┘
+
+Blockers can move state back:
+  AWAITING_CONFIRMATIONS → COORDINATION_PLANNING (new issue discovered)
+```
+
+**Implicit vs. Explicit State Visibility:**
+
+```
+IMPLICIT STATE (Before):                EXPLICIT STATE (After):
+═══════════════════════                 ══════════════════════
+
+Information Sources:                    Single Unified View:
+┌──────────────────┐                   ┌─────────────────────────┐
+│ Nurse's Memory   │                   │  Discharge Dashboard    │
+│ "I think..."     │                   │                         │
+├──────────────────┤                   │  ✓ Medical clearance    │
+│ Phone Messages   │                   │  ⏳ Home health pending  │
+│ (not returned)   │                   │  ⚠ Equipment - wrong    │
+├──────────────────┤                   │     address             │
+│ Email            │    Transform      │  ✓ Family contacted     │
+│ (wrong dept)     │  ────────────>    │  ⏳ Pharmacy checking    │
+├──────────────────┤                   │  ✗ Transport not        │
+│ Sticky Notes     │                   │     arranged            │
+│ (on desk)        │                   │                         │
+├──────────────────┤                   │  Status: AWAITING_      │
+│ Assumptions      │                   │  CONFIRMATIONS          │
+│ "Someone must    │                   │                         │
+│  have..."        │                   │  Earliest discharge:    │
+└──────────────────┘                   │  Tomorrow 2:00 PM       │
+                                        └─────────────────────────┘
+Result: Fragmented,                     Result: Complete,
+        incomplete view                         actionable view
 ```
 
 ### Implementation
@@ -270,6 +358,164 @@ An explicit model might push for discharge: "All items complete → discharge re
 
 **The model doesn't capture human intuition** about factors it can't measure.
 
+**6. False Reporting and Status Manipulation**
+
+When discharge readiness becomes a measured performance metric, staff may manipulate the system to meet targets rather than accurately represent reality.
+
+**The Scenario:**
+
+Hospital administration implements a new metric: "Percentage of medically cleared patients discharged within 24 hours." Department performance reviews and bonuses are tied to this metric.
+
+**The Pressure:**
+
+- Case managers feel pressure to mark items as complete even when confirmation is pending
+- Nurses check boxes based on assumptions rather than verified facts
+- "✓ Family available" gets marked when daughter says "I'll try to be there" (not a firm commitment)
+- "✓ Medication education complete" gets checked after a rushed 5-minute conversation
+- Status updates become optimistic rather than realistic to avoid appearing as a bottleneck
+
+**The Reality:**
+
+```
+What the Dashboard Shows:
+✓ All items complete
+Status: READY_TO_DISCHARGE
+Target: Within 24-hour window
+
+What Actually Happened:
+⚠ Home health called but didn't confirm - assumed they'll be ready
+⚠ Equipment delivery "should arrive" but no tracking number provided
+⚠ Family "probably" available but hasn't confirmed specific time
+⚠ Patient seemed confused during medication review but time was limited
+```
+
+**The Consequences:**
+
+- Dashboard shows false readiness while real blockers remain hidden
+- Patients discharged prematurely, leading to:
+  - Higher readmission rates (patient returns within 72 hours)
+  - Safety incidents (falls, medication errors at home)
+  - Family complaints (unprepared for care responsibilities)
+- Loss of trust in the system ("the dashboard is useless, we can't believe it")
+- Blame shifting when problems occur ("but you marked it complete!")
+
+**Why This Happens:**
+
+When explicit state becomes a performance metric rather than a coordination tool:
+- Incentives misalign (look good vs. be accurate)
+- Fear of negative consequences (bad performance reviews)
+- Time pressure (easier to check the box than verify thoroughly)
+- Normalization of shortcuts ("everyone does it")
+- Target fixation (hit the metric, ignore the underlying goal)
+
+This is a specific instance of **Goodhart's Law**: "When a measure becomes a target, it ceases to be a good measure."
+
+### Possible Guardrails to Prevent False Reporting
+
+While no system can completely prevent gaming, certain design choices and organizational practices can reduce false reporting:
+
+**1. Separate Tracking from Performance Measurement**
+
+- Use the state model for coordination, not performance evaluation
+- Don't tie individual performance reviews or bonuses to state completion rates
+- Measure outcomes (readmission rates, patient satisfaction) not process compliance
+- Make clear: the dashboard is a tool for coordination, not a scorecard
+
+**2. Require Evidence for Critical Items**
+
+Instead of binary checkboxes:
+```
+❌ Bad:  ✓ Home health arranged
+✓ Good: Home health arranged: ComfortCare confirmed, Start date: 1/15, Contact: Jane Smith 555-0123
+```
+
+For high-risk items, require:
+- Specific confirmation details (who, when, confirmation number)
+- Timestamp of verification
+- Evidence reference (confirmation email, phone log)
+- This makes false reporting harder and more detectable
+
+**3. Build in Uncertainty States**
+
+Allow staff to represent partial or uncertain information:
+```
+Status Options:
+✓ CONFIRMED (verified with evidence)
+⏳ PENDING (initiated but awaiting confirmation)
+~ LIKELY (based on reasonable expectation but not confirmed)
+⚠ CONCERN (potential issue identified)
+✗ NOT STARTED
+```
+
+This reduces pressure to mark things "complete" when they're actually "probably okay."
+
+**4. Audit and Spot-Check Reality**
+
+- Randomly audit cases: does dashboard match reality?
+- Call home health agencies to verify what was marked "confirmed"
+- Interview patients post-discharge: was the preparation adequate?
+- Track correlation between dashboard completion and actual outcomes
+- Make results visible: "Dashboard accuracy rate: 73%" signals the problem
+
+**5. Safe Reporting of Blockers**
+
+- Make it safe to report problems without blame
+- Recognize staff who identify issues early (even if it delays discharge)
+- Track "blockers surfaced" as a positive metric (early problem detection)
+- Avoid "why wasn't this discharged?" interrogations that punish honesty
+
+**6. Workflow Design to Reduce Pressure**
+
+- Start discharge planning earlier (when first medically cleared, not when bed needed)
+- Allow realistic timeframes (not every discharge can be same-day)
+- Staff adequate resources (if case managers are overwhelmed, shortcuts happen)
+- Provide tools to automate verification (system checks pharmacy inventory, not phone calls)
+
+**7. Real-Time Validation Where Possible**
+
+- Integrate with external systems (pharmacy inventory, home health scheduling)
+- Automated confirmation (home health agency's system confirms directly)
+- Family confirmation via patient portal (not just verbal commitment)
+- Equipment delivery tracking (real-time status from vendor system)
+- Reduce reliance on staff manually marking things "complete"
+
+**8. Cultural and Training Approaches**
+
+- Train on the "why": dashboard helps coordinate care, not judge performance
+- Share stories of when false reporting led to patient harm
+- Encourage professional judgment: "if you're not confident, don't check it"
+- Leadership modeling: administrators acknowledging when systems fail, not blaming staff
+- Regular discussion of ethical use of state tracking tools
+
+**9. Design for Transparency of Gaming**
+
+- Show edit history: who changed status and when
+- Flag rapid status changes (all items marked complete within 5 minutes = suspicious)
+- Track patterns: if certain staff always mark complete faster, investigate
+- Make gaming visible to reduce temptation
+
+**10. Outcome-Based Validation**
+
+- Correlate dashboard "ready" with actual discharge success
+- Track: When marked READY_TO_DISCHARGE, what % actually discharge without issues?
+- Use discrepancies to identify where false reporting may be occurring
+- Feedback loop: "Last month, 40% of 'ready' discharges had problems - what's wrong?"
+
+### The Fundamental Challenge
+
+Even with guardrails, tension remains between:
+- **Coordination need**: accurate state visibility helps teams work together
+- **Performance pressure**: organizations want faster, smoother discharges
+- **Human factors**: staff are busy, face pressure, and make tradeoffs
+
+Explicit state models don't eliminate these tensions - they make them visible. The guardrails don't prevent gaming entirely, but they can:
+- Make false reporting harder to do undetectably
+- Reduce organizational incentives to game
+- Create feedback loops that reveal when gaming is happening
+- Support staff who want to be accurate despite pressure
+
+**The real guardrail is organizational culture**: if leadership rewards speed over accuracy, gaming will persist regardless of technical controls. If leadership values honest communication and patient safety over metrics, the state model can be a genuine coordination tool.
+
 ## Deeper Questions
 
 This scenario raises questions beyond "is explicit state better?":
@@ -332,6 +578,6 @@ The goal is to understand **when**, **how**, and **at what cost** making state e
 
 ---
 
-**Continue to:** [Finance Scenario →](/scenarios/finance)
+**Continue to:** [Finance Scenario →](finance.md)
 
-**Explore:** [Core Concepts](/concepts/core) | [Failure Modes](/concepts/failure-modes) | [Back to Home](/)
+**Explore:** [Core Concepts](../concepts/core.md) | [Failure Modes](../concepts/failure-modes.md) | [Back to Home](../index.md)

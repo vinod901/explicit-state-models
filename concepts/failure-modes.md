@@ -1,11 +1,6 @@
----
-layout: default
-title: Failure Modes of Explicit State Models
----
-
 # Failure Modes of Explicit State Models
 
-[← Back to Home](/)
+[← Back to Home](../index.md)
 
 ## Introduction
 
@@ -533,4 +528,4 @@ The goal is not to avoid explicit state modeling because of failure modes. The g
 
 ---
 
-**Explore:** [Healthcare Scenario](/scenarios/healthcare) | [Finance Scenario](/scenarios/finance) | [Core Concepts](/concepts/core) | [Uncertainty](/concepts/uncertainty) | [Back to Home](/)
+**Explore:** [Healthcare Scenario](../scenarios/healthcare.md) | [Finance Scenario](../scenarios/finance.md) | [Core Concepts](core.md) | [Uncertainty](uncertainty.md) | [Back to Home](../index.md)

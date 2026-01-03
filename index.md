@@ -1,8 +1,3 @@
----
-layout: default
-title: Home
----
-
 # Explicit State Models
 
 ## A Documentation Exploration
@@ -38,21 +33,21 @@ This repository documents concrete scenarios showing this pattern, including whe
 
 ## Scenarios
 
-### [Healthcare: Patient Discharge Coordination](/scenarios/healthcare)
+### [Healthcare: Patient Discharge Coordination](scenarios/healthcare.md)
 A patient is ready for discharge, but implicit state about home care arrangements, medication availability, and follow-up scheduling creates delays and risks. We examine how explicit state models might help—and what they cannot solve.
 
-### [Finance: Commercial Loan Approval](/scenarios/finance)
+### [Finance: Commercial Loan Approval](scenarios/finance.md)
 A loan application moves through multiple review stages, but fragmented state about approvals, exceptions, and pending documentation creates confusion and compliance risk. We explore explicit state modeling and its limitations.
 
 ## Core Concepts
 
-### [States, Transitions, and Invariants](/concepts/core)
+### [States, Transitions, and Invariants](concepts/core.md)
 What explicit state models include: named states, valid transitions, and invariants that must hold.
 
-### [Confidence and Uncertainty](/concepts/uncertainty)
+### [Confidence and Uncertainty](concepts/uncertainty.md)
 State models are approximations. We examine how to represent confidence levels and acknowledge what cannot be captured.
 
-### [Failure Modes](/concepts/failure-modes)
+### [Failure Modes](concepts/failure-modes.md)
 When explicit state models create new problems: over-specification, false precision, coordination overhead, and resistance to reality.
 
 ## What This Project Is Not
@@ -64,10 +59,10 @@ When explicit state models create new problems: over-specification, false precis
 
 ## About This Project
 
-This is **living documentation**, published via GitHub Pages, continuously evolving as we explore more scenarios and deepen our understanding of when and how explicit state modeling matters—and when it doesn't.
+This is **living documentation**, continuously evolving as we explore more scenarios and deepen our understanding of when and how explicit state modeling matters—and when it doesn't.
 
 The goal is clarity, not completeness. We favor concrete scenarios over abstract theory, and acknowledge trade-offs over claiming solutions.
 
 ---
 
-**Start with:** [Healthcare Scenario](/scenarios/healthcare) | [Finance Scenario](/scenarios/finance) | [Core Concepts](/concepts/core)
+**Start with:** [Healthcare Scenario](scenarios/healthcare.md) | [Finance Scenario](scenarios/finance.md) | [Core Concepts](concepts/core.md)

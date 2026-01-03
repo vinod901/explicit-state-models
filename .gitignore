@@ -1,8 +1,11 @@
-_site/
-.sass-cache/
-.jekyll-cache/
-.jekyll-metadata
-vendor/
-.bundle/
-*.gem
-Gemfile.lock
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+

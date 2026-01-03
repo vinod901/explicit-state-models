@@ -1,11 +1,6 @@
----
-layout: default
-title: Uncertainty and Confidence in State Models
----
-
 # Uncertainty and Confidence in State Models
 
-[← Back to Home](/)
+[← Back to Home](../index.md)
 
 ## The Central Problem
 
@@ -427,6 +422,6 @@ Sometimes that means simple binary states with human judgment. Sometimes it mean
 
 ---
 
-**Continue to:** [Failure Modes →](/concepts/failure-modes)
+**Continue to:** [Failure Modes →](failure-modes.md)
 
-**Explore:** [Healthcare Scenario](/scenarios/healthcare) | [Finance Scenario](/scenarios/finance) | [Core Concepts](/concepts/core) | [Back to Home](/)
+**Explore:** [Healthcare Scenario](../scenarios/healthcare.md) | [Finance Scenario](../scenarios/finance.md) | [Core Concepts](core.md) | [Back to Home](../index.md)

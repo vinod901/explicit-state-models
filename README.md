@@ -10,9 +10,7 @@ Through detailed, end-to-end scenarios from healthcare and finance, we explore h
 
 ## View the Documentation
 
-The full documentation is published via GitHub Pages:
-
-**[https://vinod901.github.io/explicit-state-models](https://vinod901.github.io/explicit-state-models)**
+Start with [index.md](index.md) for the full documentation overview.
 
 ## What's Inside
 
